@@ -11,6 +11,35 @@ from datetime import datetime
 import requests
 from urllib.parse import urlparse
 from elasticapm.contrib.flask import ElasticAPM
+import psycopg2
+
+
+class TPPDb():
+    def __init__(self):
+        DB_PARAMS ={
+            'dbname': 'postgres',
+            'user': 'postgres',
+            'password': 'password',
+            'host': 'localhost',
+            'port': 5432
+        }
+        self.conn = psycopg2.connect(**DB_PARAMS)
+
+    def add_user(self, username, password):
+        with self.conn.cursor() as cur:
+            cur.execute("INSERT INTO users (user_name, password) VALUES (%s, %s);", (username, password))
+            self.conn.commit()
+
+
+    def add_domain(self,domain,status,ssl_expiration,ssl_issuer)
+        with self.conn.cursor() as cur:
+            cur.execute("INSERT INTO users (domain,status,ssl_expiration,ssl_issuer) VALUES (%s, %s, %s, %s);", (domain,status,ssl_expiration,ssl_issuer))
+            self.conn.commit()
+
+
+
+            
+tpp_db_obj = TPPDb()
 
 # --- Load Configuration ---
 with open('be_config.yaml', 'r') as f:
@@ -168,12 +197,14 @@ def register():
     if not username or not password:
         return jsonify({"message": "Username and password are required!"}), 400
 
-    users = load_users()
-    if any(u["username"] == username for u in users):
-        return jsonify({"message": "Username already exists!"}), 409
+    
+    tpp_db_obj.add_user(username, password)
+    # users = load_users()
+    # if any(u["username"] == username for u in users):
+    #     return jsonify({"message": "Username already exists!"}), 409
 
-    users.append({"username": username, "password": password})
-    save_users(users)
+    # users.append({"username": username, "password": password})
+    # save_users(users)
     return jsonify({"message": "Registration successful!"}), 201
 
 @app.route('/api/domains', methods=['GET'])
