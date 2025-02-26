@@ -1,0 +1,8 @@
+[
+    {
+        "domain": "haim.com",
+        "status": "Up",
+        "ssl_expiration": "2025-05-20",
+        "ssl_issuer": "Let's Encrypt"
+    }
+]
